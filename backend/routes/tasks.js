@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     });
 
     console.log(allTasks);
-    return res.json(allTasks);
+    return res.status(200).json(allTasks);
 });
 
 router.get("/:id", async (req, res) => {
@@ -32,12 +32,14 @@ router.get("/:id", async (req, res) => {
     });
 
     console.log(oneTask);
-    return res.json(oneTask);
+    return res.status(200).json(oneTask);
 });
 
 router.post("/", async (req, res) => {
     const body = req.body?.body;
     const done = req.body?.done;
+
+    console.log("post request", body, done);
 
     const loggedUser = await prisma.user.findFirst({
         where: { username: req.loggedUsername },
@@ -46,7 +48,7 @@ router.post("/", async (req, res) => {
     const newTask = await prisma.task.create({
         data: { body, done: Boolean(done), authorId: loggedUser.id },
     });
-    return res.json({ body: newTask.body, done: newTask.done });
+    return res.status(200).json({ body: newTask.body, done: newTask.done });
 });
 
 router.put("/:id", async (req, res) => {
@@ -62,7 +64,9 @@ router.put("/:id", async (req, res) => {
         where: { id, authorId: loggedUser.id },
         data: { body, done: Boolean(done), authorId: loggedUser.id },
     });
-    return res.json({ msg: "updated", body: newTask.body, done: newTask.done });
+    return res
+        .status(200)
+        .json({ msg: "updated", body: newTask.body, done: newTask.done });
 });
 
 router.delete("/:id", async (req, res) => {
@@ -75,7 +79,7 @@ router.delete("/:id", async (req, res) => {
     const deletedTask = await prisma.task.delete({
         where: { id, authorId: loggedUser.id },
     });
-    return res.json({ msg: "deleted", body: deletedTask.body });
+    return res.status(200).json({ msg: "deleted", body: deletedTask.body });
 });
 
 module.exports = router;
